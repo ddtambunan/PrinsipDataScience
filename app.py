@@ -1,7 +1,7 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
+from streamlit_jupyter import StreamlitPatcher
 
-# code streamlit kamu
+StreamlitPatcher().jupyter()
+
 st.title("Dashboard Saya")
-st.write("Hello world")
+st.write("Hello from notebook")
