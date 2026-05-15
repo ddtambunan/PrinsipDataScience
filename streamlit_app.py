@@ -11,11 +11,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="Commodity Price Heatmap", layout="wide")
+st.set_page_config(page_title="commodity Price Heatmap", layout="wide")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data\commodity_prices_clean_visualisasi.csv")
+    df = pd.read_csv("data\commodity_prices_clean_model.csv")
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
     text_cols = ["commodity_name", "group", "category_map", "sub_category1", "sub_category2"]
