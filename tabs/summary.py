@@ -74,7 +74,7 @@ def render_summary():
         pilih_komoditas = st.multiselect(
             "Pilih Komoditas",
             daftar_komoditas,
-            default=["Gold","Platinum"]   
+            default=["Platinum","Gold"]   
         )
 
     with col_f2:
@@ -193,7 +193,7 @@ def render_summary():
         st.warning("Silakan pilih minimal satu komoditas terlebih dahulu.")
     else:
         # Membuat tab secara dinamis berdasarkan list komoditas
-        tabs = st.tabs(pilih_komoditas, default="Platinum")
+        tabs = st.tabs(pilih_komoditas)
 
         # Looping untuk mengisi konten di setiap tab
         for i, komoditas in enumerate(pilih_komoditas):
