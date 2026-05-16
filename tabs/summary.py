@@ -74,7 +74,7 @@ def render_summary():
         pilih_komoditas = st.multiselect(
             "Pilih Komoditas",
             daftar_komoditas,
-            default=["Platinum","Gold"]   
+            default=["Gold","Platinum"]   
         )
 
     with col_f2:
