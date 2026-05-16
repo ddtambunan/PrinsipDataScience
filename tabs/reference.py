@@ -18,19 +18,9 @@ def render_reference():
     # b. Summary data standard dari file commodity yang sudah bersih
     # c. Data dictionary dari file commodity
 
-
+    
     # ==========================================
-    # 1. Konfigurasi awal halaman dashboard
-    # ==========================================
-    st.set_page_config(
-        page_title="Dashboard Harga Komoditas",
-        page_icon=str(BASE_DIR / "assets"/"icons" / "dashboard.jpg"),
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
-
-    # ==========================================
-    # 2. Load Data
+    # 1. Load Data
     # ==========================================
     @st.cache_data
     def load_data():
