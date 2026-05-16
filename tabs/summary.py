@@ -90,7 +90,7 @@ def render_summary():
     if not pilih_komoditas:
         st.warning("Pilih minimal satu komoditas.")
     else:
-        tabs = st.tabs(pilih_komoditas)
+        tabs = st.tabs(pilih_komoditas,default="Platinum")
 
         for tab, komoditas in zip(tabs, pilih_komoditas):
             with tab:
