@@ -69,29 +69,44 @@ def render_summary():
     # ==========================================
     #st.title("Dashboard Analitik Komoditas Emas")
 
-    col_f1, col_f2, col_f3 = st.columns(3, border=True)
+   col_f1, col_f2, col_f3 = st.columns(3, border=True)
+
     with col_f1:
         pilih_komoditas = st.multiselect(
             "Pilih Komoditas",
             daftar_komoditas,
-            default=["Gold","Platinum"]   
+            default=["Platinum", "Gold"]
         )
 
     with col_f2:
-        tahun = st.slider("Pilih Rentang Tahun", int(df['year'].min()), int(df['year'].max()), (1960, 2024))
-        
-        
-    with col_f3:
-        opsi_era = ["All"] + sorted(df["era"].dropna().unique().tolist())
+        opsi_era = ["All"] + sorted(df["era"].dropna().astype(str).unique().tolist())
         pilih_era = st.selectbox(
             "Pilih Era",
             options=opsi_era,
             index=0
         )
 
-    df_filter = df[(df['year'] >= tahun[0]) & (df['year'] <= tahun[1]) ]
-    if pilih_era != "All":
-        df_filter = df_filter[df_filter["era"] == pilih_era]
+    if pilih_era == "All":
+        df_tmp = df.copy()
+    else:
+        df_tmp = df[df["era"].astype(str) == pilih_era].copy()
+
+    tahun_min = int(df_tmp["year"].min())
+    tahun_max = int(df_tmp["year"].max())
+
+    with col_f3:
+        tahun = st.slider(
+            "Pilih Rentang Tahun",
+            min_value=tahun_min,
+            max_value=tahun_max,
+            value=(tahun_min, tahun_max)
+        )
+
+    # filter final
+    df_filter = df_tmp[
+        (df_tmp["year"] >= tahun[0]) &
+        (df_tmp["year"] <= tahun[1])
+    ].copy()
 
     # ==========================================
     # 4. KPI Scorecatds
