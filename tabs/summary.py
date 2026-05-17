@@ -58,8 +58,6 @@ def render_summary():
     def format_number(x):
         return "-" if pd.isna(x) else f"{x:,.2f}"
         
-
-         
     df = load_data()
     daftar_komoditas = get_commodity_cols()
     COLORS=get_color_map()
@@ -69,7 +67,7 @@ def render_summary():
     # ==========================================
     #st.title("Dashboard Analitik Komoditas Emas")
 
-   col_f1, col_f2, col_f3 = st.columns(3, border=True)
+    col_f1, col_f2, col_f3 = st.columns(3, border=True)
 
     with col_f1:
         pilih_komoditas = st.multiselect(
