@@ -4,6 +4,7 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import numpy_financial as npf
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
@@ -58,6 +59,8 @@ def render_summary():
     def format_number(x):
         return "-" if pd.isna(x) else f"{x:,.2f}"
         
+
+         
     df = load_data()
     daftar_komoditas = get_commodity_cols()
     COLORS=get_color_map()
@@ -106,6 +109,7 @@ def render_summary():
         (df_tmp["year"] <= tahun[1])
     ].copy()
 
+
     # ==========================================
     # 4. KPI Scorecatds
     # ==========================================
@@ -126,7 +130,7 @@ def render_summary():
                     st.info(f"Tidak ada data untuk {komoditas}.")
                     continue
 
-                kpi1, kpi2, kpi3, kpi4,kpi5 = st.columns(5, border=True)
+                kpi1, kpi2, kpi3, kpi4,kpi5,kpi6 = st.columns(6, border=True)
 
                 kpi1.metric( f"Rata-rata",f"{s.mean():,.2f}")
                 kpi2.metric( f"Median ",f"{s.median():,.2f}")
@@ -134,7 +138,28 @@ def render_summary():
                 kpi4.metric( f"Terendah ",f"{s.min():,.2f}")
                 kpi5.metric("Skewness", f"{s.skew():.2f}")
                 
-     
+                s = df_filter.sort_values("date")[["date", komoditas]].dropna()
+
+                awal = s.loc[s["date"] == s["date"].min(), komoditas]
+                akhir = s.loc[s["date"] == s["date"].max(), komoditas]
+
+                harga_awal = awal.item() if len(awal) == 1 else awal.squeeze()
+                harga_akhir = akhir.item() if len(akhir) == 1 else akhir.squeeze()
+                jumlah_periode = s["date"].max().year - s["date"].min().year
+   
+
+                if jumlah_periode > 0 and harga_awal > 0:
+                    rate = npf.rate(
+                        nper=jumlah_periode, 
+                        pmt=0, 
+                        pv=-harga_awal, 
+                        fv=harga_akhir
+                    )
+                    rate_persen = rate * 100
+                    kpi6.metric("Return/tahun", f"{rate_persen:+.2f}%")
+                else:
+                    kpi6.metric("Return/tahun", "N/A")
+                
     
     # =================================================
     # 5. Bagian Bawah (Diagram Korelasi & Scatter Plot
