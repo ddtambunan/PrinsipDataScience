@@ -2,7 +2,6 @@ Streamlit==1.41
 pandas
 numpy
 plotly
-statsmodels
 scikit-learn
 statsmodels
 numpy_financial
