@@ -69,18 +69,29 @@ def render_summary():
     # ==========================================
     #st.title("Dashboard Analitik Komoditas Emas")
 
-    col_f1, col_f2 = st.columns(2, border=True)
+    col_f1, col_f2, col_f3 = st.columns(3, border=True)
     with col_f1:
         pilih_komoditas = st.multiselect(
             "Pilih Komoditas",
             daftar_komoditas,
-            default=["Gold","Platinum"]   
+            default=["Platinum","Gold"]   
         )
 
     with col_f2:
         tahun = st.slider("Pilih Rentang Tahun", int(df['year'].min()), int(df['year'].max()), (1960, 2024))
+        
+        
+    with col_f3:
+        opsi_era = ["All"] + sorted(df["era"].dropna().unique().tolist())
+        pilih_era = st.selectbox(
+            "Pilih Era",
+            options=opsi_era,
+            index=0
+        )
 
     df_filter = df[(df['year'] >= tahun[0]) & (df['year'] <= tahun[1]) ]
+    if pilih_era != "All":
+        df_filter = df_filter[df_filter["era"] == pilih_era]
 
     # ==========================================
     # 4. KPI Scorecatds
@@ -110,10 +121,63 @@ def render_summary():
                 kpi4.metric( f"Terendah ",f"{s.min():,.2f}")
                 kpi5.metric("Skewness", f"{s.skew():.2f}")
                 
-                
+     
+    
+    # =================================================
+    # 5. Bagian Bawah (Diagram Korelasi & Scatter Plot
+    # =================================================
+  
+    if not pilih_komoditas:
+        st.warning("Silakan pilih minimal satu komoditas terlebih dahulu.")
+    else:
+        # Membuat tab secara dinamis berdasarkan list komoditas
+        tabs = st.tabs(pilih_komoditas)
+
+        # Looping untuk mengisi konten di setiap tab
+        for i, komoditas in enumerate(pilih_komoditas):
+            with tabs[i]:
+                # Membuat 3 kolom di dalam tab aktif sesuai struktur kode Anda
+                col_frekuensi, col_distribusi, col_scatter = st.columns(3, border=True)
+
+                with col_frekuensi:
+                    st.subheader(f"Histogram Harga {komoditas}")
+                    fig_hist = px.histogram(df_filter, x=komoditas, nbins=30, title=f"Frekuensi Harga {komoditas}")
+                    fig_hist.update_layout(margin=dict(t=30, b=0), height=200)
+                    st.plotly_chart(fig_hist, use_container_width=True)
+
+                with col_distribusi:
+                    st.subheader(f"Distribusi Data {komoditas}")
+                    fig_box = px.box(df_filter, x='quarter', y=komoditas, title=f"Variabilitas per Kuartal ({komoditas})")
+                    fig_box.update_layout(margin=dict(t=30, b=0), height=200)
+                    st.plotly_chart(fig_box, use_container_width=True)
+                    
+                 
+                with col_scatter:
+                    st.subheader(f"Scatter {komoditas} vs Gold")
+
+                    if komoditas == "Gold":
+                        st.info("Scatter untuk Gold tidak ditampilkan karena Gold adalah variabel acuan.")
+                    else:
+                        d = df_filter[["date", "Gold", komoditas]].dropna()
+
+                        if d.empty:
+                            st.info(f"Tidak ada data Gold vs {komoditas}.")
+                        else:
+                            fig_scatter = px.scatter(
+                                d,
+                                x="Gold",
+                                y=komoditas,
+                                trendline="ols",
+                                title=f"Gold vs {komoditas}"
+                            )
+                            fig_scatter.update_layout(margin=dict(t=30, b=0), height=200)
+                            st.plotly_chart(fig_scatter, use_container_width=True)   
+                                
+                   
+     
                 
     # ====================================================
-    # 5. BAGIAN TENGAH: LINE CHART dengan 4 opsi Scalling
+    # 6. BAGIAN TENGAH: LINE CHART dengan 4 opsi Scalling
     # ====================================================
     col_korelasi, col_line = st.columns([1, 1.4], gap="small", border=True)
 
@@ -184,55 +248,3 @@ def render_summary():
         st.plotly_chart(fig_line, use_container_width=True)
 
 
-
-    # =================================================
-    # 6. Bagian Bawah (Diagram Korelasi & Scatter Plot
-    # =================================================
-  
-    if not pilih_komoditas:
-        st.warning("Silakan pilih minimal satu komoditas terlebih dahulu.")
-    else:
-        # Membuat tab secara dinamis berdasarkan list komoditas
-        tabs = st.tabs(pilih_komoditas) 
-
-        # Looping untuk mengisi konten di setiap tab
-        for i, komoditas in enumerate(pilih_komoditas):
-            with tabs[i]:
-                # Membuat 3 kolom di dalam tab aktif sesuai struktur kode Anda
-                col_frekuensi, col_distribusi, col_scatter = st.columns(3, border=True)
-
-                with col_frekuensi:
-                    st.subheader(f"Histogram Harga {komoditas}")
-                    fig_hist = px.histogram(df_filter, x=komoditas, nbins=30, title=f"Frekuensi Harga {komoditas}")
-                    fig_hist.update_layout(margin=dict(t=30, b=0), height=200)
-                    st.plotly_chart(fig_hist, use_container_width=True)
-
-                with col_distribusi:
-                    st.subheader(f"Distribusi Data {komoditas}")
-                    fig_box = px.box(df_filter, x='quarter', y=komoditas, title=f"Variabilitas per Kuartal ({komoditas})")
-                    fig_box.update_layout(margin=dict(t=30, b=0), height=200)
-                    st.plotly_chart(fig_box, use_container_width=True)
-                    
-                 
-                with col_scatter:
-                    st.subheader(f"Scatter {komoditas} vs Gold")
-
-                    if komoditas == "Gold":
-                        st.info("Scatter untuk Gold tidak ditampilkan karena Gold adalah variabel acuan.")
-                    else:
-                        d = df_filter[["date", "Gold", komoditas]].dropna()
-
-                        if d.empty:
-                            st.info(f"Tidak ada data Gold vs {komoditas}.")
-                        else:
-                            fig_scatter = px.scatter(
-                                d,
-                                x="Gold",
-                                y=komoditas,
-                                trendline="ols",
-                                title=f"Gold vs {komoditas}"
-                            )
-                            fig_scatter.update_layout(margin=dict(t=30, b=0), height=200)
-                            st.plotly_chart(fig_scatter, use_container_width=True)   
-                                
-                   
