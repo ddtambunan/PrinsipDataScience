@@ -35,7 +35,7 @@ st.title("Dashboard Analitik Komoditas Emas")
 # 2. Penambahan tab untuk mengakses file summary dan reference
 # ============================================================
 
-tab_reference, tab_summary = st.tabs(["Reference", "Summary"])
+tab_reference, tab_summary = st.tabs(["Reference", "Summary","Project"])
 
 with tab_reference:
     render_reference()
