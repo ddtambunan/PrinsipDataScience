@@ -42,3 +42,6 @@ with tab_reference:
 
 with tab_summary:
     render_summary()
+    
+with tab_project:
+    render_project()
